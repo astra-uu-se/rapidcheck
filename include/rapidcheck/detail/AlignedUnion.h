@@ -1,4 +1,5 @@
 #pragma once
+#include <cstddef>
 
 namespace rc {
 namespace detail {
@@ -17,9 +18,9 @@ struct MaxOf<V1, V2, Vs...>
 
 /// Replacement for std::aligned_union for compiles that do not have it.
 template <typename... Ts>
-using AlignedUnion =
-    typename std::aligned_storage<MaxOf<sizeof(Ts)...>::value,
-                                  MaxOf<alignof(Ts)...>::value>::type;
-
+class AlignedUnion {
+private:
+  alignas(Ts...) std::byte t_buff[std::max({sizeof(Ts)...})];
+};
 } // namespace detail
 } // namespace rc

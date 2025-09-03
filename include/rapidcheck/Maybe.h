@@ -1,7 +1,7 @@
 #pragma once
 
-#include <type_traits>
 #include <iostream>
+#include <type_traits>
 
 #include "rapidcheck/Nothing.h"
 
@@ -42,7 +42,7 @@ public:
   /// old value gets destroyed. If the constructor of the new value throws an
   /// exception, this `Maybe` will be uninitialized on return.
   template <typename... Args>
-  void init(Args &&... args);
+  void init(Args &&...args);
 
   /// Resets this `Maybe`, destroying the contained object.
   void reset();
@@ -71,18 +71,20 @@ public:
   Maybe(const Maybe &other) noexcept(
       std::is_nothrow_copy_constructible<T>::value);
   Maybe &operator=(const Maybe &rhs) noexcept(
-      std::is_nothrow_copy_constructible<T>::value
-          &&std::is_nothrow_copy_assignable<T>::value);
+      std::is_nothrow_copy_constructible<T>::value &&
+      std::is_nothrow_copy_assignable<T>::value);
 
   Maybe(Maybe &&other) noexcept(std::is_nothrow_move_constructible<T>::value);
-  Maybe &operator=(Maybe &&rhs) noexcept(std::is_nothrow_move_constructible<
-      T>::value &&std::is_nothrow_move_assignable<T>::value);
+  Maybe &operator=(Maybe &&rhs) noexcept(
+      std::is_nothrow_move_constructible<T>::value &&
+      std::is_nothrow_move_assignable<T>::value);
 
   ~Maybe();
 
 private:
-  using Storage = typename std::aligned_storage<sizeof(T), alignof(T)>::type;
-  Storage m_storage;
+  class Storage {
+    alignas(T) std::byte t_buff[sizeof(T)];
+  } m_storage;
   bool m_initialized;
 };
 
